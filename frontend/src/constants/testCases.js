@@ -1,0 +1,124 @@
+/**
+ * Casos de prueba de MathLite y código por defecto.
+ */
+
+export const TEST_CASES = [
+  { id:1, name:'expresión aritmética con precedencia', cat:'válido', catClass:'cat-ok',
+    desc:'Evalúa (3 + 4 * 2) / (1 - 5)^2 respetando precedencia',
+    code:`-- Expresión aritmética con precedencia mixta\nlet r = (3 + 4 * 2) / (1 - 5) ^ 2\nprint(r)`,
+    expect:'0.9375' },
+  { id:2, name:'factorial recursivo', cat:'válido', catClass:'cat-ok',
+    desc:'Función factorial recursiva con caso base',
+    code:`-- Factorial recursivo\ndef factorial(n) {\n  if n == 0 {\n    return 1\n  } else {\n    return n * factorial(n - 1)\n  }\n}\nprint(factorial(5))\nprint(factorial(0))\nprint(factorial(7))`,
+    expect:'120\n1\n5040' },
+  { id:3, name:'ciclo while — suma 1 a n', cat:'válido', catClass:'cat-ok',
+    desc:'Acumula suma de 1 a n con while',
+    code:`-- Suma de 1 a n con while\nlet n = 10\nlet suma = 0\nlet i = 1\nwhile i <= n {\n  let suma = suma + i\n  let i = i + 1\n}\nprint(suma)`,
+    expect:'55' },
+  { id:4, name:'funciones trigonométricas', cat:'válido', catClass:'cat-ok',
+    desc:'sin, cos, sqrt dentro de expresiones compuestas',
+    code:`-- Funciones matemáticas integradas\nlet pi = 3.14159265\nlet angulo = pi / 6\nprint(sin(angulo))\nprint(cos(angulo))\nprint(sqrt(16))\nprint(abs(-42))\nprint(floor(3.9))\nprint(ceil(3.1))`,
+    expect:'0.5, 0.866025, 4, 42, 3, 4' },
+  { id:5, name:'función llama a función', cat:'válido', catClass:'cat-ok',
+    desc:'Una función definida en el programa llama a otra',
+    code:`-- Función que llama a otra\ndef cuadrado(x) {\n  return x * x\n}\ndef sumaCuadrados(a, b) {\n  return cuadrado(a) + cuadrado(b)\n}\nprint(sumaCuadrados(3, 4))\nprint(sumaCuadrados(5, 12))`,
+    expect:'25\n169' },
+  { id:6, name:'área de triángulo', cat:'válido', catClass:'cat-ok',
+    desc:'Ejemplo del enunciado: declaración, función, while',
+    code:`-- Declaración de variables\nlet base = 5\nlet altura = 3.0\n\n-- Función que calcula el área\ndef area(b, h) {\n  return (b * h) / 2\n}\n\nlet resultado = area(base, altura)\nprint(resultado)\n\n-- Ciclo while\nlet i = 1\nwhile i <= 5 {\n  print(i * i)\n  let i = i + 1\n}`,
+    expect:'7.5\n1\n4\n9\n16\n25' },
+  { id:7, name:'carácter inválido @', cat:'error léxico', catClass:'cat-err',
+    desc:'El analizador reporta el error y continúa',
+    code:`let x = 5\nlet y = x @ 3\nprint(x)`,
+    expect:"Error léxico: carácter inválido @, luego continúa y imprime 5" },
+  { id:8, name:'cadena sin cerrar', cat:'error léxico', catClass:'cat-err',
+    desc:'Cadena de texto sin comilla de cierre',
+    code:`let msg = "hola mundo\nprint(msg)`,
+    expect:'Error léxico: cadena sin cerrar' },
+  { id:9, name:'paréntesis sin cerrar', cat:'error sintáctico', catClass:'cat-err',
+    desc:'Expresión con paréntesis sin cerrar',
+    code:`let r = (3 + 4 * 2\nprint(r)`,
+    expect:"Error sintáctico: se esperaba )" },
+  { id:10, name:'if sin condición', cat:'error sintáctico', catClass:'cat-err',
+    desc:'Sentencia if sin expresión de condición',
+    code:`let x = 5\nif {\n  print(x)\n}`,
+    expect:'Error sintáctico' },
+  { id:11, name:'variable no declarada', cat:'error semántico', catClass:'cat-err',
+    desc:'Uso de variable sin declarar previamente',
+    code:`print(variableNoExiste)`,
+    expect:'Error semántico: variable no declarada' },
+  { id:12, name:'aridad incorrecta', cat:'error semántico', catClass:'cat-err',
+    desc:'Llamada con número incorrecto de argumentos',
+    code:`def suma(a, b) {\n  return a + b\n}\nprint(suma(1, 2, 3))`,
+    expect:'Error semántico: aridad incorrecta' },
+  { id:13, name:'tipos incompatibles', cat:'error semántico', catClass:'cat-err',
+    desc:'Operación inválida entre String e Int',
+    code:`let r = "hola" * 5\nprint(r)`,
+    expect:'Error semántico: operación inválida' },
+  { id:14, name:'return fuera de función', cat:'error semántico', catClass:'cat-err',
+    desc:'Uso de return en el alcance global',
+    code:`let x = 10\nreturn x`,
+    expect:'Error semántico: return fuera de función' },
+  { id:15, name:'división por cero', cat:'error ejecución', catClass:'cat-err',
+    desc:'División por cero en tiempo de ejecución',
+    code:`let r = 10 / 0\nprint(r)`,
+    expect:'Error de ejecución: división por cero' },
+  { id:16, name:'función no definida', cat:'error ejecución', catClass:'cat-err',
+    desc:'Llamada a función que no existe en el programa',
+    code:`print(funcionQueNoExiste(5))`,
+    expect:'Error: función no definida' },
+  { id:17, name:'expresión lógica compuesta', cat:'válido', catClass:'cat-ok',
+    desc:'Operadores and, or, not con comparaciones',
+    code:`let a = 5\nlet b = 10\nlet c = 3\nprint(a < b and c < a)\nprint(a == 5 or b == 0)\nprint(not (a > b))`,
+    expect:'true\ntrue\ntrue' },
+  { id:18, name:'potenciación y módulo', cat:'válido', catClass:'cat-ok',
+    desc:'Operadores ^ y % con precedencia',
+    code:`print(2 ^ 10)\nprint(17 % 5)\nprint(2 ^ 3 ^ 2)`,
+    expect:'1024\n2\n512' },
+  { id:19, name:'operaciones con strings', cat:'válido', catClass:'cat-ok',
+    desc:'Concatenación de cadenas con +',
+    code:`let s1 = "Hola"\nlet s2 = " mundo"\nlet msg = s1 + s2\nprint(msg)`,
+    expect:'Hola mundo' },
+  { id:20, name:'fibonacci iterativo', cat:'válido', catClass:'cat-ok',
+    desc:'Cálculo de Fibonacci con while',
+    code:`-- Fibonacci iterativo\nlet n = 10\nlet a = 0\nlet b = 1\nlet i = 0\nwhile i < n {\n  print(a)\n  let temp = a + b\n  let a = b\n  let b = temp\n  let i = i + 1\n}`,
+    expect:'0 1 1 2 3 5 8 13 21 34' },
+  { id:21, name:'anidamiento if-else', cat:'válido', catClass:'cat-ok',
+    desc:'Condicionales anidados',
+    code:`def clasificar(x) {\n  if x < 0 {\n    return "negativo"\n  } else {\n    if x == 0 {\n      return "cero"\n    } else {\n      return "positivo"\n    }\n  }\n}\nprint(clasificar(-5))\nprint(clasificar(0))\nprint(clasificar(7))`,
+    expect:'negativo\ncero\npositivo' },
+  { id:22, name:'múltiples funciones y variables', cat:'válido', catClass:'cat-ok',
+    desc:'Programa complejo con varias funciones',
+    code:`def max(a, b) {\n  if a >= b {\n    return a\n  } else {\n    return b\n  }\n}\ndef min(a, b) {\n  if a <= b {\n    return a\n  } else {\n    return b\n  }\n}\nlet x = 15\nlet y = 23\nprint(max(x, y))\nprint(min(x, y))`,
+    expect:'23\n15' },
+  { id:23, name:'función sin retorno explícito', cat:'válido', catClass:'cat-ok',
+    desc:'Función que imprime pero no retorna valor',
+    code:`def saludar(nombre) {\n  print("Hola " + nombre)\n}\nsaludar("mundo")\nsaludar("MathLite")`,
+    expect:'Hola mundo\nHola MathLite' },
+  { id:24, name:'redeclaración en mismo alcance', cat:'error semántico', catClass:'cat-warn',
+    desc:'Variable redeclarada en el mismo scope',
+    code:`let x = 5\nlet x = 10\nprint(x)`,
+    expect:'Advertencia semántica: redeclaración de x' },
+  { id:25, name:'log y funciones matemáticas', cat:'válido', catClass:'cat-ok',
+    desc:'Funciones matemáticas integradas: log, sqrt, abs',
+    code:`print(log(1))\nprint(sqrt(2))\nprint(abs(-3.14))\nprint(ceil(2.3))\nprint(floor(2.9))`,
+    expect:'0\n1.414213\n3.14\n3\n2' },
+]
+
+export const DEFAULT_CODE = `-- Bienvenido a MathLite
+-- Presiona ▶ ejecutar para empezar
+
+def factorial(n) {
+  if n == 0 {
+    return 1
+  } else {
+    return n * factorial(n - 1)
+  }
+}
+
+let resultado = factorial(6)
+print(resultado)
+
+-- También puedes usar funciones matemáticas:
+print(sqrt(144))
+print(sin(0))`
