@@ -50,7 +50,7 @@ mathlite/
             ├── ConsolePanel.jsx        ← Consola de salida
             ├── TokensPanel.jsx         ← Flujo de tokens
             ├── AnalysisPanel.jsx       ← Análisis léxico/sintáctico/semántico
-            ├── ASTPanel.jsx            ← Árbol de sintaxis abstracta
+            ├── ASTPanel.jsx            ← Árbol de sintaxis abstracta con render Mermaid
             ├── TestsPanel.jsx          ← Casos de prueba
             └── common/
                 ├── ConsoleLine.jsx
@@ -111,6 +111,16 @@ Abre el navegador en **http://localhost:3000**
 | 4 | Análisis semántico | `core/semantic.py` |
 | 5 | Intérprete | `core/interpreter.py` |
 | 6 | Aplicación web | `frontend/` |
+| 7 | Visualización dinámica del AST | `frontend/src/components/ASTPanel.jsx` + Mermaid |
+
+## Visualización del AST
+
+La pestaña **árbol AST** del frontend renderiza el AST con Mermaid de forma dinámica y mantiene una vista textual de respaldo cuando el render no está disponible.
+
+Dependencias relevantes:
+
+- `frontend/package.json` incluye `mermaid` como dependencia.
+- `frontend/src/components/ASTPanel.jsx` construye el grafo Mermaid y lo renderiza en tiempo de ejecución.
 
 ---
 
