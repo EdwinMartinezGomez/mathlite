@@ -109,9 +109,13 @@ def parse(tokens: list):
 
     def parse_if():
         t = eat(TK.IF)
-        cond = parse_expr()
-        if not check(TK.LBRACE):
-            errors.append({'msg': 'se esperaba { después de condición if', 'line': t['line'] if t else 0, 'col': 0, 'phase': 'sintáctico'})
+        if check(TK.LBRACE):
+            errors.append({'msg': 'falta condición en if', 'line': t['line'] if t else 0, 'col': t['col'] if t and 'col' in t else 0, 'phase': 'sintáctico'})
+            cond = {'type': 'BoolNode', 'value': False, 'line': t['line'] if t else 0}
+        else:
+            cond = parse_expr()
+            if not check(TK.LBRACE):
+                errors.append({'msg': 'se esperaba { después de condición if', 'line': t['line'] if t else 0, 'col': 0, 'phase': 'sintáctico'})
         then = parse_block()
         alt = None
         if match(TK.ELSE):
