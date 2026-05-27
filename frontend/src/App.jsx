@@ -2,10 +2,10 @@
  * App.jsx — Orquestador principal de MathLite.
  * Maneja el estado global y compone todos los componentes.
  */
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { S } from './styles/appStyles'
-import { TEST_CASES, DEFAULT_CODE } from './constants/testCases'
-import { runProgram } from './services/api'
+import { DEFAULT_CODE } from './constants/testCases'
+import { runProgram, fetchTests } from './services/api'
 
 // Componentes
 import Titlebar from './components/Titlebar'
@@ -30,7 +30,22 @@ export default function App() {
   const [activeTab,  setActiveTab]  = useState('tokens')
   const [running,    setRunning]    = useState(false)
   const [result,     setResult]     = useState(null)
+  const [tests,      setTests]      = useState([])
   const [conLines,   setConLines]   = useState([{ text:'-- listo. escribe un programa y presiona ejecutar.', cls:'c-dim' }])
+
+  useEffect(() => {
+    let alive = true
+
+    fetchTests()
+      .then(data => {
+        if (alive) setTests(Array.isArray(data) ? data : [])
+      })
+      .catch(() => {
+        if (alive) setTests([])
+      })
+
+    return () => { alive = false }
+  }, [])
 
   const addLine = useCallback((text, cls) => {
     setConLines(prev => [...prev, { text, cls: cls || 'c-w' }])
@@ -70,12 +85,12 @@ export default function App() {
 
   // ── Acciones de test cases ───────────────────────────────────────────────
   function loadCode(id) {
-    const t = TEST_CASES.find(x => x.id === id)
+    const t = tests.find(x => x.id === id)
     if (t) setCode(t.code)
   }
 
   function loadAndRun(id) {
-    const t = TEST_CASES.find(x => x.id === id)
+    const t = tests.find(x => x.id === id)
     if (!t) return
     setCode(t.code)
     setActiveTab('tokens')
@@ -151,7 +166,7 @@ export default function App() {
           )}
 
           {activeTab === 'tests' && (
-            <TestsPanel onLoadAndRun={loadAndRun} onLoad={loadCode} />
+            <TestsPanel tests={tests} onLoadAndRun={loadAndRun} onLoad={loadCode} />
           )}
         </div>
       </div>
