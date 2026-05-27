@@ -58,6 +58,9 @@ def parse(tokens: list):
                         break
                     nonlocal pos  # noqa: F821
                     pos += 1
+                # Si el token actual es un delimitador de cierre, consumirlo para evitar bucles infinitos.
+                if check(TK.RBRACE):
+                    pos += 1
                 match(TK.SEMI)
         return {'type': 'Program', 'body': stmts}
 
