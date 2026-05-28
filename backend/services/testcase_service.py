@@ -18,6 +18,8 @@ SEED_FILE = Path(__file__).resolve().parents[1] / "data" / "test_cases_seed.json
 
 
 def _collection():
+    if not MONGO_URI:
+        raise RuntimeError("MONGO_URI no está configurada")
     client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=3000)
     return client[MONGO_DB][MONGO_COLLECTION]
 
