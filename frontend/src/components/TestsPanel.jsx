@@ -3,16 +3,17 @@
  */
 import { useState } from 'react'
 import { S } from '../styles/appStyles'
+import { TEST_CASES } from '../constants/testCases'
 
-export default function TestsPanel({ tests = [], onLoadAndRun, onLoad }) {
+export default function TestsPanel({ onLoadAndRun, onLoad }) {
   const [selected, setSelected] = useState(null)
-  const t = tests.find(x => x.id === selected)
+  const t = TEST_CASES.find(x => x.id === selected)
   const catColors = { 'cat-ok':'var(--ok)', 'cat-err':'var(--err)', 'cat-warn':'var(--warn)' }
 
   return (
     <div style={S.testsWrap}>
       <div style={S.testsList}>
-        {tests.map(tc => (
+        {TEST_CASES.map(tc => (
           <div key={tc.id} style={S.testItem(selected===tc.id)} onClick={()=>setSelected(tc.id)}>
             <div style={S.testName}>{tc.name}</div>
             <div style={{ fontSize:10, fontFamily:"'JetBrains Mono', monospace", letterSpacing:'0.06em', color:catColors[tc.catClass] }}>{tc.cat}</div>
@@ -20,9 +21,7 @@ export default function TestsPanel({ tests = [], onLoadAndRun, onLoad }) {
         ))}
       </div>
       <div style={S.testDetail}>
-        {tests.length === 0 ? (
-          <div style={S.empty}>cargando casos desde MongoDB...</div>
-        ) : !t ? (
+        {!t ? (
           <div style={S.empty}>selecciona un caso de prueba</div>
         ) : (
           <>

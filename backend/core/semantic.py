@@ -110,9 +110,7 @@ def analyze(ast: dict):
             in_func = prev_fn
 
         elif t == 'IfStmt':
-            typ = infer(node['cond'])
-            if typ not in ('Bool', '?'):
-                errors.append({'msg': 'condición de if debe ser booleana', 'line': node.get('line', 0), 'phase': 'semántico'})
+            infer(node['cond'])
             walk_block(node['then'])
             if node.get('alt'):
                 if node['alt'].get('type') == 'IfStmt':

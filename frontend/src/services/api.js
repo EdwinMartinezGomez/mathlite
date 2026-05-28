@@ -16,15 +16,6 @@ export async function runProgram(code) {
 }
 
 /**
- * Obtiene los casos de prueba desde el backend.
- * @returns {Promise<object[]>}
- */
-export async function fetchTests() {
-  const { data } = await axios.get(`${API}/tests`)
-  return data
-}
-
-/**
  * Verifica que el backend esté activo.
  * @returns {Promise<object>} Estado del servicio
  */
