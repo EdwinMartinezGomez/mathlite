@@ -2,15 +2,16 @@
  * App.jsx — Orquestador principal de MathLite.
  * Maneja el estado global y compone todos los componentes.
  */
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { S } from './styles/appStyles'
-import { TEST_CASES, DEFAULT_CODE } from './constants/testCases'
-import { runProgram } from './services/api'
+import { DEFAULT_CODE } from './constants/testCases'
+import { runProgram, fetchTests } from './services/api'
 
 // Componentes
 import Titlebar from './components/Titlebar'
 import EditorPanel from './components/EditorPanel'
 import ConsolePanel from './components/ConsolePanel'
+import ReplPanel from './components/ReplPanel'
 import TokensPanel from './components/TokensPanel'
 import AnalysisPanel from './components/AnalysisPanel'
 import ASTPanel from './components/ASTPanel'
@@ -27,13 +28,35 @@ const TABS = [
 // ─── Componente principal ─────────────────────────────────────────────────────
 export default function App() {
   const [code,       setCode]       = useState(DEFAULT_CODE)
+  const [mode,       setMode]       = useState('editor')
   const [activeTab,  setActiveTab]  = useState('tokens')
   const [running,    setRunning]    = useState(false)
   const [result,     setResult]     = useState(null)
+  const [tests,     setTests]      = useState([])
   const [conLines,   setConLines]   = useState([{ text:'-- listo. escribe un programa y presiona ejecutar.', cls:'c-dim' }])
+
+  useEffect(() => {
+    let alive = true
+
+    fetchTests()
+      .then(data => {
+        if (alive) setTests(Array.isArray(data) ? data : [])
+      })
+      .catch(() => {
+        if (alive) setTests([])
+      })
+
+    return () => { alive = false }
+  }, [])
 
   const addLine = useCallback((text, cls) => {
     setConLines(prev => [...prev, { text, cls: cls || 'c-w' }])
+  }, [])
+
+  const executeSource = useCallback(async (source) => {
+    const data = await runProgram(source)
+    setResult(data)
+    return data
   }, [])
 
   // ── Ejecutar código ──────────────────────────────────────────────────────
@@ -45,8 +68,7 @@ export default function App() {
     setRunning(true)
 
     try {
-      const data = await runProgram(source)
-      setResult(data)
+      const data = await executeSource(source)
 
       data.output.forEach(line => addLine(line, 'c-print'))
 
@@ -70,14 +92,15 @@ export default function App() {
 
   // ── Acciones de test cases ───────────────────────────────────────────────
   function loadCode(id) {
-    const t = TEST_CASES.find(x => x.id === id)
+    const t = tests.find(x => x.id === id)
     if (t) setCode(t.code)
   }
 
   function loadAndRun(id) {
-    const t = TEST_CASES.find(x => x.id === id)
+    const t = tests.find(x => x.id === id)
     if (!t) return
     setCode(t.code)
+    setMode('editor')
     setActiveTab('tokens')
     setTimeout(() => runCode(t.code), 80)
   }
@@ -109,15 +132,29 @@ export default function App() {
       <div style={S.main}>
         {/* ── LEFT: EDITOR + CONSOLE ── */}
         <div style={S.left}>
-          <EditorPanel
-            code={code}
-            onCodeChange={setCode}
-            onRun={() => runCode()}
-            running={running}
-            errors={errors}
-            onClear={handleClear}
-          />
-          <ConsolePanel conLines={conLines} onClear={handleClearConsole} />
+          <div style={S.modeBar}>
+            <div style={S.modeTabs}>
+              <button style={S.modeTab(mode === 'editor')} onClick={() => setMode('editor')}>editor</button>
+              <button style={S.modeTab(mode === 'repl')} onClick={() => setMode('repl')}>repl</button>
+            </div>
+            <div style={S.modeHint}>{mode === 'repl' ? 'modo interactivo por línea' : 'modo edición del programa completo'}</div>
+          </div>
+
+          {mode === 'editor' ? (
+            <>
+              <EditorPanel
+                code={code}
+                onCodeChange={setCode}
+                onRun={() => runCode()}
+                running={running}
+                errors={errors}
+                onClear={handleClear}
+              />
+              <ConsolePanel conLines={conLines} onClear={handleClearConsole} />
+            </>
+          ) : (
+            <ReplPanel onExecuteSource={executeSource} />
+          )}
         </div>
 
         {/* ── RIGHT: PANELS ── */}
@@ -151,7 +188,7 @@ export default function App() {
           )}
 
           {activeTab === 'tests' && (
-            <TestsPanel onLoadAndRun={loadAndRun} onLoad={loadCode} />
+            <TestsPanel tests={tests} onLoadAndRun={loadAndRun} onLoad={loadCode} />
           )}
         </div>
       </div>

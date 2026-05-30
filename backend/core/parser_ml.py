@@ -58,6 +58,8 @@ def parse(tokens: list):
                         break
                     nonlocal pos  # noqa: F821
                     pos += 1
+                if check(TK.RBRACE):
+                    pos += 1
                 match(TK.SEMI)
         return {'type': 'Program', 'body': stmts}
 

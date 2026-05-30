@@ -1,0 +1,56 @@
+[33mcommit 5a416ae0f716cedecbb8cad8b227e4e8149a64c4[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: fabian2ll <fabian.vargas06@uptc.edu.co>
+Date:   Wed May 27 22:07:24 2026 -0500
+
+    cambios if-mongo
+
+[33mcommit fb948adb8e377a5292d980ed318fec08a966c1a0[m[33m ([m[1;31mupstream/main[m[33m, [m[1;31mupstream/HEAD[m[33m)[m
+Author: fabian2ll <fabian.vargas06@uptc.edu.co>
+Date:   Wed May 27 21:03:35 2026 -0500
+
+    sync: apply upstream/main content into main
+
+[33mcommit b6b260e1feff16676254803e83ae37e9925e0ac7[m
+Author: fabian2ll <fabian.vargas06@uptc.edu.co>
+Date:   Wed May 27 10:34:28 2026 -0500
+
+    MongoDB implementation
+
+[33mcommit 0fdbde54afc336ecf01c4481acc616233343b40f[m
+Author: fabian2ll <fabian.vargas06@uptc.edu.co>
+Date:   Tue May 26 21:10:02 2026 -0500
+
+    final symbols in if
+
+[33mcommit 6e964e8358c147f823a861c521ad60dd714292e6[m
+Author: fabian2ll <fabian.vargas06@uptc.edu.co>
+Date:   Tue May 26 21:01:39 2026 -0500
+
+    If fixed
+
+[33mcommit 7a8c77f4fee050a58a2d31f025e59f566bf99762[m
+Author: fabian2ll <fabian.vargas06@uptc.edu.co>
+Date:   Sun May 24 21:49:15 2026 -0500
+
+    Publish Mermaid frontend build
+
+[33mcommit 1de911fa0ae1074fa35cbfafda9e00765eabd413[m[33m ([m[1;31morigin/sync/upstream-main[m[33m, [m[1;32msync/upstream-main[m[33m)[m
+Merge: e5d08fb 17d08a9
+Author: Edwin Martinez <136619319+EdwinMartinezGomez@users.noreply.github.com>
+Date:   Mon May 11 10:22:00 2026 -0500
+
+    Merge pull request #1 from fabian2ll/main
+    
+    implementacion memaid
+
+[33mcommit 17d08a99968e31487d79dbc2d8f80477512c68fd[m
+Author: fabian2ll <fabian.vargas06@uptc.edu.co>
+Date:   Sat May 9 09:23:27 2026 -0500
+
+    implementacion memaid
+
+[33mcommit e5d08fbafdf25d9f589dd8a83f2687c9416170e6[m
+Author: Edwin Martinez <edwin.martinez04@uptc.edu.co>
+Date:   Fri May 1 22:14:51 2026 -0500
+
+    Refactor: Arquitectura modular para Backend y Frontend en MathLite
