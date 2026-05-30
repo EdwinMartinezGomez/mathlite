@@ -109,18 +109,28 @@ def parse(tokens: list):
 
     def parse_if():
         t = eat(TK.IF)
-        cond = parse_expr()
-        if not check(TK.LBRACE):
-            errors.append({'msg': 'se esperaba { después de condición if', 'line': t['line'] if t else 0, 'col': 0, 'phase': 'sintáctico'})
+        if check(TK.LBRACE):
+            errors.append({'msg': 'falta condición en if', 'line': t['line'] if t else 0, 'col': t['col'] if t else 0, 'phase': 'sintáctico'})
+            cond = {'type': 'BoolNode', 'value': False, 'line': t['line'] if t else 0}
+        else:
+            cond = parse_expr()
+            if not check(TK.LBRACE):
+                errors.append({'msg': 'se esperaba { después de condición if', 'line': t['line'] if t else 0, 'col': 0, 'phase': 'sintáctico'})
         then = parse_block()
         alt = None
         if match(TK.ELSE):
             alt = parse_if() if check(TK.IF) else parse_block()
         return {'type': 'IfStmt', 'cond': cond, 'then': then, 'alt': alt, 'line': t['line'] if t else 0}
-
+    
     def parse_while():
         t = eat(TK.WHILE)
-        cond = parse_expr()
+        if check(TK.LBRACE):
+            errors.append({'msg': 'falta condición en while', 'line': t['line'] if t else 0, 'col': t['col'] if t else 0, 'phase': 'sintáctico'})
+            cond = {'type': 'BoolNode', 'value': False, 'line': t['line'] if t else 0}
+        else:
+            cond = parse_expr()
+            if not check(TK.LBRACE):
+                errors.append({'msg': 'se esperaba { después de condición while', 'line': t['line'] if t else 0, 'col': 0, 'phase': 'sintáctico'})
         body = parse_block()
         return {'type': 'WhileStmt', 'cond': cond, 'body': body, 'line': t['line'] if t else 0}
 
