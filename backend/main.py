@@ -1,33 +1,84 @@
 """
-MathLite API — FastAPI Backend
-Punto de entrada: arranque del servidor y registro de rutas.
+MathLite API — servidor de backend sin dependencias web.
+
+Expone los endpoints que consume el frontend:
+- GET /api/health
+- GET /api/tests
+- POST /api/run
 """
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
 
-from routes import router
+from __future__ import annotations
 
-app = FastAPI(title="MathLite API", version="1.0.0")
+import json
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from typing import Any
 
-# ── CORS: permitir peticiones desde el frontend React ─────────────────────────
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# ── Registrar rutas ───────────────────────────────────────────────────────────
-app.include_router(router)
+from services.expression_service import ExpressionService
+from services.testcase_service import list_tests
 
 
-@app.get("/", include_in_schema=False)
-def root():
-    """Redirige la ruta raíz a la documentación interactiva."""
-    return RedirectResponse(url="/docs")
+class MathLiteHandler(BaseHTTPRequestHandler):
+    server_version = "MathLiteHTTP/1.0"
+
+    def _set_headers(self, status: int = 200, content_type: str = "application/json") -> None:
+        self.send_response(status)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.end_headers()
+
+    def _write_json(self, payload: Any, status: int = 200) -> None:
+        body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+        self._set_headers(status=status)
+        self.wfile.write(body)
+
+    def do_OPTIONS(self) -> None:  # noqa: N802
+        self._set_headers(status=204)
+
+    def do_GET(self) -> None:  # noqa: N802
+        if self.path == "/api/health":
+            self._write_json({"status": "ok", "service": "MathLite API"})
+            return
+
+        if self.path == "/api/tests":
+            try:
+                self._write_json(list_tests())
+            except RuntimeError as exc:
+                self._write_json({"detail": str(exc)}, status=503)
+            return
+
+        if self.path == "/":
+            self._set_headers(status=200, content_type="text/plain; charset=utf-8")
+            self.wfile.write(b"MathLite API")
+            return
+
+        self._write_json({"detail": "Not found"}, status=404)
+
+    def do_POST(self) -> None:  # noqa: N802
+        if self.path != "/api/run":
+            self._write_json({"detail": "Not found"}, status=404)
+            return
+
+        try:
+            content_length = int(self.headers.get("Content-Length", "0"))
+            raw_body = self.rfile.read(content_length) if content_length > 0 else b"{}"
+            payload = json.loads(raw_body.decode("utf-8"))
+            code = payload.get("code", "")
+            result = ExpressionService.execute(code)
+            self._write_json(result)
+        except json.JSONDecodeError:
+            self._write_json({"detail": "Invalid JSON body"}, status=400)
+        except Exception as exc:
+            self._write_json({"detail": str(exc)}, status=500)
 
 
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    server = ThreadingHTTPServer(("0.0.0.0", 8000), MathLiteHandler)
+    try:
+        print("MathLite API running on http://0.0.0.0:8000")
+        server.serve_forever()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        server.server_close()

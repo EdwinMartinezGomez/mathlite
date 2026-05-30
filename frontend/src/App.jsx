@@ -11,6 +11,7 @@ import { runProgram, fetchTests } from './services/api'
 import Titlebar from './components/Titlebar'
 import EditorPanel from './components/EditorPanel'
 import ConsolePanel from './components/ConsolePanel'
+import ReplPanel from './components/ReplPanel'
 import TokensPanel from './components/TokensPanel'
 import AnalysisPanel from './components/AnalysisPanel'
 import ASTPanel from './components/ASTPanel'
@@ -27,6 +28,7 @@ const TABS = [
 // ─── Componente principal ─────────────────────────────────────────────────────
 export default function App() {
   const [code,       setCode]       = useState(DEFAULT_CODE)
+  const [mode,       setMode]       = useState('editor')
   const [activeTab,  setActiveTab]  = useState('tokens')
   const [running,    setRunning]    = useState(false)
   const [result,     setResult]     = useState(null)
@@ -51,6 +53,12 @@ export default function App() {
     setConLines(prev => [...prev, { text, cls: cls || 'c-w' }])
   }, [])
 
+  const executeSource = useCallback(async (source) => {
+    const data = await runProgram(source)
+    setResult(data)
+    return data
+  }, [])
+
   // ── Ejecutar código ──────────────────────────────────────────────────────
   async function runCode(src) {
     const source = src ?? code
@@ -60,8 +68,7 @@ export default function App() {
     setRunning(true)
 
     try {
-      const data = await runProgram(source)
-      setResult(data)
+      const data = await executeSource(source)
 
       data.output.forEach(line => addLine(line, 'c-print'))
 
@@ -93,6 +100,7 @@ export default function App() {
     const t = tests.find(x => x.id === id)
     if (!t) return
     setCode(t.code)
+    setMode('editor')
     setActiveTab('tokens')
     setTimeout(() => runCode(t.code), 80)
   }
@@ -124,15 +132,29 @@ export default function App() {
       <div style={S.main}>
         {/* ── LEFT: EDITOR + CONSOLE ── */}
         <div style={S.left}>
-          <EditorPanel
-            code={code}
-            onCodeChange={setCode}
-            onRun={() => runCode()}
-            running={running}
-            errors={errors}
-            onClear={handleClear}
-          />
-          <ConsolePanel conLines={conLines} onClear={handleClearConsole} />
+          <div style={S.modeBar}>
+            <div style={S.modeTabs}>
+              <button style={S.modeTab(mode === 'editor')} onClick={() => setMode('editor')}>editor</button>
+              <button style={S.modeTab(mode === 'repl')} onClick={() => setMode('repl')}>repl</button>
+            </div>
+            <div style={S.modeHint}>{mode === 'repl' ? 'modo interactivo por línea' : 'modo edición del programa completo'}</div>
+          </div>
+
+          {mode === 'editor' ? (
+            <>
+              <EditorPanel
+                code={code}
+                onCodeChange={setCode}
+                onRun={() => runCode()}
+                running={running}
+                errors={errors}
+                onClear={handleClear}
+              />
+              <ConsolePanel conLines={conLines} onClear={handleClearConsole} />
+            </>
+          ) : (
+            <ReplPanel onExecuteSource={executeSource} />
+          )}
         </div>
 
         {/* ── RIGHT: PANELS ── */}
