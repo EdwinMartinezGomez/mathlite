@@ -110,7 +110,9 @@ def analyze(ast: dict):
             in_func = prev_fn
 
         elif t == 'IfStmt':
-            infer(node['cond'])
+            typ = infer(node['cond'])
+            if typ not in ('Bool', '?'):
+                errors.append({'msg': 'condición de if debe ser booleana', 'line': node.get('line', 0), 'phase': 'semántico'})
             walk_block(node['then'])
             if node.get('alt'):
                 if node['alt'].get('type') == 'IfStmt':
@@ -119,7 +121,9 @@ def analyze(ast: dict):
                     walk_block(node['alt'])
 
         elif t == 'WhileStmt':
-            infer(node['cond'])
+            typ = infer(node['cond'])
+            if typ not in ('Bool', '?'):
+                errors.append({'msg': 'condición de while debe ser booleana', 'line': node.get('line', 0), 'phase': 'semántico'})
             walk_block(node['body'])
 
         elif t == 'ReturnStmt':
